@@ -3,7 +3,7 @@ import sys
 import os
 
 pygame.init()
-pygame.key.set_repeat(20, 20)
+pygame.key.set_repeat(10, 100)
 size = WIDTH, HEIGHT = 1920, 1080
 screen = pygame.display.set_mode((size), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
@@ -52,22 +52,13 @@ def start_screen():
         screen.blit(string_rendered, intro_rect)
         screen.blit(horrortextstart, (100, 700))
 
-    # while True:
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             terminate()
-    #         elif event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_ESCAPE:
-    #                 terminate()
-    #             if event.key == pygame.K_SPACE:
-    #                 return  # начинаем игру
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    terminate()
+                if event.key == pygame.K_SPACE:
+                    return  # начинаем игру
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -86,10 +77,10 @@ def load_level(filename):
 
 
 tile_images = {
-    'wall': load_image('WALL.png'),
-    'empty': load_image('GRASS.png')
+    'wall': load_image('wall.png'),
+    'empty': load_image('grass.png')
 }
-player_image = load_image('MAINC.png')
+player_image = load_image('cher.png')
 
 tile_width = tile_height = 200
 
@@ -162,30 +153,42 @@ if __name__ == '__main__':
 
     fps = 60
     running = True
-    STEP = 25
+    STEP = 25  # 10 tile_width
+    keys = pygame.key.get_pressed()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 dx, dy = 0, 0
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_ESCAPE:
+                    terminate()
+                if event.key == pygame.K_a:
                     dx, dy = -STEP, 0
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_a and (event.mod & pygame.KMOD_SHIFT):
+                    dx, dy = -STEP - 30, 0
+                if event.key == pygame.K_d:
                     dx, dy = STEP, 0
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_d and (event.mod & pygame.KMOD_SHIFT):
+                    dx, dy = STEP + 30, 0
+                if event.key == pygame.K_w:
                     dx, dy = 0, -STEP
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_w and (event.mod & pygame.KMOD_SHIFT):
+                    dx, dy = 0, -STEP - 30
+                if event.key == pygame.K_s:
                     dx, dy = 0, STEP
+                if event.key == pygame.K_s and (event.mod & pygame.KMOD_SHIFT):
+                    dx, dy = 0, STEP + 30
                 player.update(dx, dy)
-    screen.fill('black')
 
-    camera.update(player)
-    # обновляем положение всех спрайтов
-    for sprite in all_sprites:
-        camera.apply(sprite)
-    tiles_group.draw(screen)
-    player_group.draw(screen)
-    pygame.display.flip()
-    clock.tick(fps)
+        screen.fill('black')
+        # изменяем ракурс камеры
+        camera.update(player)
+        # обновляем положение всех спрайтов
+        for sprite in all_sprites:
+            camera.apply(sprite)
+        tiles_group.draw(screen)
+        player_group.draw(screen)
+        pygame.display.flip()
+        clock.tick(fps)
     pygame.quit()
