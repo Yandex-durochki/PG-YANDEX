@@ -151,6 +151,12 @@ if __name__ == '__main__':
     player, level_x, level_y = generate_level(load_level('level_0.txt'))
     camera = Camera()
 
+    ten = pygame.sprite.Sprite(player_group)
+    ten.image = load_image('t.png')
+    ten.rect = ten.image.get_rect()
+    ten.rect.x = 0
+    ten.rect.y = 0
+
     fps = 60
     running = True
     STEP = 25  # 10 tile_width
