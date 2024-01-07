@@ -50,7 +50,7 @@ def start_screen():
         intro_rect.x = 100
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-        screen.blit(horrortextstart, (100, 700))
+    screen.blit(horrortextstart, (100, 700))
 
     while True:
         for event in pygame.event.get():
@@ -77,19 +77,42 @@ def load_level(filename):
 
 
 tile_images = {
-    'wall': load_image('wall.png'),
-    'empty': load_image('grass.png')
+    'normgrass': load_image('Grass100.png'),
+    'rockgrass': load_image('RG100.png'),
+    'rockgrasszab': load_image('RGw100.png'),
+    'wall': load_image('Wall100.png'),
+    'wallh': load_image('WallH100.png'),
+    'Wfloor': load_image('Wfloor100.png'),
+    'WallHwP1': load_image('WallHwP1-100.png'),
+    'WallHwP2': load_image('WallHwP2-100.png'),
+    'RG90': load_image('RG100R90.png'),
+    'RG180': load_image('RG100R180.png'),
+    'src': load_image('src.png')
 }
-player_image = load_image('cher.png')
+player_image = load_image('mainch.png')
 
-tile_width = tile_height = 200
+tile_width = tile_height = 100
 
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.image = tile_images[tile_type]
+        if tile_type == 'rockgrasszab':
+            self.add(wall_group)
+        if tile_type == 'RG90':
+            self.add(wall_group)
         if tile_type == 'wall':
+            self.add(wall_group)
+        if tile_type == 'wallh':
+            self.add(wall_group)
+        if tile_type == 'WallHwP1':
+            self.add(wall_group)
+        if tile_type == 'WallHwP2':
+            self.add(wall_group)
+        if tile_type == 'RG180':
+            self.add(wall_group)
+        if tile_type == 'src':
             self.add(wall_group)
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -113,11 +136,29 @@ def generate_level(level):
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
-                Tile('empty', x, y)
+                Tile('rockgrass', x, y)
+            elif level[y][x] == '/':
+                Tile('rockgrasszab', x, y)
+            elif level[y][x] == ',':
+                Tile('normgrass', x, y)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
+            elif level[y][x] == '+':
+                Tile('wallh', x, y)
+            elif level[y][x] == '=':
+                Tile('Wfloor', x, y)
+            elif level[y][x] == '-':
+                Tile('WallHwP1', x, y)
+            elif level[y][x] == '_':
+                Tile('WallHwP2', x, y)
+            elif level[y][x] == ')':
+                Tile('RG90', x, y)
+            elif level[y][x] == '(':
+                Tile('RG180', x, y)
+            elif level[y][x] == ']':
+                Tile('src', x, y)
             elif level[y][x] == '@':
-                Tile('empty', x, y)
+                Tile('normgrass', x, y)
                 new_player = Player(x, y)
     # вернем игрока, а также размер поля в клетках
     return new_player, x, y
@@ -148,7 +189,7 @@ if __name__ == '__main__':
     player_group = pygame.sprite.Group()
 
     # основной персонаж
-    player, level_x, level_y = generate_level(load_level('level_0.txt'))
+    player, level_x, level_y = generate_level(load_level('2.txt'))
     camera = Camera()
 
     ten = pygame.sprite.Sprite(player_group)
@@ -159,7 +200,7 @@ if __name__ == '__main__':
 
     fps = 60
     running = True
-    STEP = 25  # 10 tile_width
+    STEP = 10  # 10 tile_width
     keys = pygame.key.get_pressed()
     while running:
         for event in pygame.event.get():
@@ -172,19 +213,19 @@ if __name__ == '__main__':
                 if event.key == pygame.K_a:
                     dx, dy = -STEP, 0
                 if event.key == pygame.K_a and (event.mod & pygame.KMOD_SHIFT):
-                    dx, dy = -STEP - 30, 0
+                    dx, dy = -STEP - 15, 0
                 if event.key == pygame.K_d:
                     dx, dy = STEP, 0
                 if event.key == pygame.K_d and (event.mod & pygame.KMOD_SHIFT):
-                    dx, dy = STEP + 30, 0
+                    dx, dy = STEP + 15, 0
                 if event.key == pygame.K_w:
                     dx, dy = 0, -STEP
                 if event.key == pygame.K_w and (event.mod & pygame.KMOD_SHIFT):
-                    dx, dy = 0, -STEP - 30
+                    dx, dy = 0, -STEP - 15
                 if event.key == pygame.K_s:
                     dx, dy = 0, STEP
                 if event.key == pygame.K_s and (event.mod & pygame.KMOD_SHIFT):
-                    dx, dy = 0, STEP + 30
+                    dx, dy = 0, STEP + 15
                 player.update(dx, dy)
 
         screen.fill('black')
