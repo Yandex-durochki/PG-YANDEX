@@ -5,7 +5,7 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Aircraft War Game')
+pygame.display.set_caption('Звёздный бой')
 
 BULLETSHOT_SOUNDTEST = pygame.mixer.Sound('image/sound/bullet.wav')
 OPPONENT1_DOWN_SOUNDTEST = pygame.mixer.Sound('image/sound/opponent1_down.wav')
