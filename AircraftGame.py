@@ -108,6 +108,7 @@ class AircraftGame(object):
                 LKM_OK = (ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1)
                 
                 if (ev.type == pygame.QUIT):
+                    pygame.quit()
                     exit(0)
                 
                 if (mouse_rect.colliderect(play_button_rect)):
@@ -162,6 +163,7 @@ class AircraftGame(object):
             
             for ev in pygame.event.get():
                 if (ev.type == pygame.QUIT):
+                    pygame.quit()
                     exit(1)
                 if (ev.type == pygame.KEYDOWN or ev.type == pygame.MOUSEBUTTONDOWN):
                     self.hover.play()
