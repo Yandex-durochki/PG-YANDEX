@@ -164,7 +164,7 @@ class AircraftGame(object):
             for ev in pygame.event.get():
                 if (ev.type == pygame.QUIT):
                     pygame.quit()
-                    exit(1)
+                    exit(0)
                 if (ev.type == pygame.KEYDOWN or ev.type == pygame.MOUSEBUTTONDOWN):
                     self.hover.play()
                     self.clear_screen()
@@ -327,7 +327,7 @@ class AircraftGame(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    exit(0)
                 elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
                     self.clear_screen()
                     self.hover.play()
