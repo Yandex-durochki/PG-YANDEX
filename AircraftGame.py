@@ -1,7 +1,30 @@
+
+"""
+Copyright (c) 2024 Yandex-durochki
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 from sys import exit
 from pygame.locals import *
 from StrategyGame import *
-import random
+import random 
 
 class AircraftGame(object):
     def __init__(self):
@@ -14,6 +37,12 @@ class AircraftGame(object):
         self.GAME_BACKGROUND          = None
         self.GAME_OVER                = None
         self.AIRCRAFT_IMAGES          = None
+        self.hover                    = None
+        
+        self.play_button_image        = None
+        self.how_to_play_button_image = None
+        self.how_to_play_info         = None
+        self.logo                     = None
         
         self.init_display()
         self.load_images()
@@ -30,26 +59,127 @@ class AircraftGame(object):
         self.BULLETSHOT_SOUNDTEST = pygame.mixer.Sound('image/sound/bullet.wav')
         self.OPPONENT1_DOWN_SOUNDTEST = pygame.mixer.Sound('image/sound/opponent1_down.wav')
         self.GAMEOVER_SOUNDTEST = pygame.mixer.Sound('image/sound/game_over.wav')
-
-    def set_sounds_volume(self):
-        self.BULLETSHOT_SOUNDTEST.set_volume(0.3)
-        self.OPPONENT1_DOWN_SOUNDTEST.set_volume(0.3)
-        self.GAMEOVER_SOUNDTEST.set_volume(0.3)
-
-    def start_main_theme(self):
-        pygame.mixer.music.load('image/sound/game_music.wav')
+        self.hover = pygame.mixer.Sound('image/sound/hover.mp3')
+        
+    def set_sounds_volume(self, new_volume = 0.3):
+        self.BULLETSHOT_SOUNDTEST.set_volume(new_volume)
+        self.OPPONENT1_DOWN_SOUNDTEST.set_volume(new_volume)
+        self.GAMEOVER_SOUNDTEST.set_volume(new_volume)
+        
+    def play_music_core(self, filename, volume):
+        if (pygame.mixer.music.get_busy()):
+            pygame.mixer.music.unload()
+        pygame.mixer.music.load('image/sound/' + filename)
         pygame.mixer.music.play(-1, 0.0)
-        pygame.mixer.music.set_volume(0.25)
+        pygame.mixer.music.set_volume(volume)
 
-    def start_game_over_theme(self):
-        pass
+    def start_main_theme(self, volume = 0.25):
+        self.play_music_core('game_music.mp3', volume)
+
+    def start_game_over_theme(self, volume = 0.5):
+        self.play_music_core('gameover.mp3', volume)
+        
+    def clear_screen(self):
+        self.screen.fill((0, 0, 0))
 
     def load_images(self):
         self.GAME_BACKGROUND = pygame.image.load('image/image/background.png').convert()
         self.GAME_OVER = pygame.image.load('image/image/gameover.png')
         self.AIRCRAFT_IMAGES = pygame.image.load('image/image/aircraft_shooter.png')
+        
+        self.play_button_image = pygame.image.load('image/image/play_button.png').convert_alpha()
+        self.how_to_play_button_image = pygame.image.load('image/image/how_to_play_button.png').convert_alpha()
+        self.how_to_play_info = pygame.image.load('image/image/how_to_play_info.png').convert_alpha()
+        self.logo = pygame.image.load('image/image/logo.png').convert_alpha()
+        
+    def main_menu(self):
+        
+        self.start_main_theme()
+        
+        on_main_menu = True
+        
+        play_button_rect = pygame.Rect(0, 0, 0, 0)
+        how_to_play_button_rect = pygame.Rect(0, 0, 0, 0)
+        mouse_rect = pygame.Rect(0, 0, 0, 0)
+        
+        while (on_main_menu):
+            for ev in pygame.event.get():
+            
+                LKM_OK = (ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1)
+                
+                if (ev.type == pygame.QUIT):
+                    exit(0)
+                
+                if (mouse_rect.colliderect(play_button_rect)):
+                    if (LKM_OK):
+                        self.hover.play()
+                        self.clear_screen()
+                        self.game_process()
+                elif (mouse_rect.colliderect(how_to_play_button_rect)):
+                    if (LKM_OK):
+                        self.hover.play()
+                        self.clear_screen()
+                        self.how_to_play_menu()
+                        
+                    
+            self.clear_screen()
+            
+            pbx = self.play_button_image.get_size()[0]
+            pby = self.play_button_image.get_size()[1]
+            
+            htpbx = self.how_to_play_button_image.get_size()[0]
+            htpby = self.how_to_play_button_image.get_size()[1]
+            
+            lx = self.logo.get_size()[0]
+            ly = self.logo.get_size()[1]
+            
+            play_button_xpos = (SCREEN_WIDTH / 2) - (pbx * 0.5)
+            play_button_ypos = 500
+           
+            how_to_play_xpos = (SCREEN_WIDTH / 2) - (htpbx * 0.5)
+            how_to_play_ypos = 600
+            
+            logo_xpos = (SCREEN_WIDTH / 2) - (lx * 0.5)
+            logo_ypos = 100
+            
+            mx = pygame.mouse.get_pos()[0]
+            my = pygame.mouse.get_pos()[1]
+               
+            self.screen.blit(self.GAME_BACKGROUND, (0, 0))
+            self.screen.blit(self.logo, (logo_xpos, logo_ypos))
+            self.screen.blit(self.play_button_image, [play_button_xpos, play_button_ypos])
+            self.screen.blit(self.how_to_play_button_image, [how_to_play_xpos, how_to_play_ypos])
+            
+            play_button_rect = pygame.Rect((play_button_xpos, play_button_ypos), (pbx, pby))
+            how_to_play_button_rect = pygame.Rect((how_to_play_xpos, how_to_play_ypos), (htpbx, htpby))
+            mouse_rect = pygame.Rect((mx, my), (1, 1))
+
+            pygame.display.update()
+            
+    def how_to_play_menu(self):
+        
+        while (True):
+            
+            for ev in pygame.event.get():
+                if (ev.type == pygame.QUIT):
+                    exit(1)
+                if (ev.type == pygame.KEYDOWN or ev.type == pygame.MOUSEBUTTONDOWN):
+                    self.hover.play()
+                    self.clear_screen()
+                    self.main_menu()
+                
+            self.clear_screen()
+            
+            self.screen.blit(self.GAME_BACKGROUND, (0, 0))
+            self.screen.blit(self.how_to_play_info, (0, 0))
+            
+            pygame.display.update()
 
     def game_process(self):
+    
+        if (self.SCORE != 0):
+            self.SCORE = 0
+    
         AIRCRAFT_PLAYER = []
         AIRCRAFT_PLAYER.append(pygame.Rect(0, 99, 102, 126))
         AIRCRAFT_PLAYER.append(pygame.Rect(165, 360, 102, 126))
@@ -83,9 +213,7 @@ class AircraftGame(object):
         
         CLOCK = pygame.time.Clock()
     
-        RUNNING = True
-    
-        while RUNNING:
+        while (True):
         
             CLOCK.tick(60)
 
@@ -164,6 +292,11 @@ class AircraftGame(object):
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                if (event.type == pygame.KEYDOWN):
+                    if (event.key == pygame.K_ESCAPE):
+                        self.hover.play()
+                        self.clear_screen()
+                        self.main_menu()
 
             KEY_PRESSED_ENTER = pygame.key.get_pressed()
             if not OPPONENT.is_hit:
@@ -177,6 +310,9 @@ class AircraftGame(object):
                     OPPONENT.moveRight()
 
     def game_over(self):
+    
+        self.start_game_over_theme()
+    
         FONT = pygame.font.Font(None, 60)
         TXT = FONT.render('Score: ' + str(self.SCORE), True, (255, 255, 0))
         TXT_AIRCRAFT = TXT.get_rect()
@@ -191,14 +327,21 @@ class AircraftGame(object):
                     pygame.quit()
                     exit()
                 elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
-                    self.screen.fill((0, 0, 0))
+                    self.clear_screen()
+                    self.hover.play()
+                    self.start_main_theme()
                     self.game_process()
-                # print("Рестарт")
-  
+                elif (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    self.clear_screen()
+                    self.hover.play()
+                    self.start_main_theme()
+                    self.main_menu()
+            
+            
             pygame.display.update()
     
 if (__name__ == '__main__'):
     main = AircraftGame()
-    main.game_process()
+    main.main_menu()
 else:
     AircraftGame = None
